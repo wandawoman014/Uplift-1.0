@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="An interactive emotional guidance scale for navigating money and work uncertainty.">
+  <title>The Emotional Guidance Scale — Money & Work</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+  <style>
+    :root{--ink:#13231c;--muted:#53665c;--line:rgba(255,255,255,.68);--glass:rgba(255,255,255,.64);--shadow:0 24px 64px rgba(28,43,36,.12);--radius:28px}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;min-height:100vh;color:var(--ink);font-family:"Figtree",system-ui,sans-serif;background:#eef4ee;overflow-x:hidden;padding-bottom:112px}
+    body:before,body:after{content:"";position:fixed;z-index:-2;border-radius:50%;filter:blur(14px);opacity:.7}
+    body:before{width:48vw;height:48vw;left:-14vw;top:-16vw;background:radial-gradient(circle,#ffc68e 0,#f4b4c5 43%,transparent 72%)}
+    body:after{width:52vw;height:52vw;right:-15vw;bottom:-22vw;background:radial-gradient(circle,#8edfc0 0,#9fc6ee 47%,transparent 72%)}
+    .aurora{position:fixed;inset:0;z-index:-3;background:linear-gradient(145deg,#fff4e6 0%,#eaf5ed 42%,#e9effb 100%)}
+    .shell{width:min(1180px,calc(100% - 32px));margin:auto;padding:32px 0 80px}
+    .glass{background:var(--glass);border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(22px) saturate(135%);-webkit-backdrop-filter:blur(22px) saturate(135%)}
+    header{border-radius:36px;padding:clamp(28px,6vw,72px);position:relative;overflow:hidden}
+    .eyebrow{display:flex;align-items:center;gap:10px;color:#4d6359;font-size:12px;text-transform:uppercase;letter-spacing:.16em;font-weight:700}
+    .eyebrow i{width:8px;height:8px;border-radius:50%;background:#7aae92;box-shadow:0 0 0 5px rgba(122,174,146,.14)}
+    h1{font-family:"Fraunces",Georgia,serif;font-size:clamp(48px,8vw,94px);line-height:.95;letter-spacing:-.055em;margin:26px 0 20px;max-width:880px;font-weight:600}
+    h1 em{font-style:italic;color:#587766;font-weight:500}
+    .dek{font-size:clamp(17px,2vw,21px);line-height:1.6;color:#53645c;max-width:700px;margin:0}
+    .principle{margin-top:30px;display:inline-flex;align-items:center;gap:12px;padding:11px 15px;border-radius:999px;background:rgba(255,255,255,.55);font-size:14px;color:#44564e}
+    .principle b{font-family:"Fraunces",Georgia,serif;font-size:18px;color:#22372d}
+    .controls{display:flex;gap:12px;align-items:center;justify-content:space-between;margin:24px 0;position:sticky;top:14px;z-index:20;border-radius:22px;padding:12px}
+    .segmented{display:flex;gap:5px;flex-wrap:wrap}
+    button{font:inherit}
+    .chip{border:0;background:transparent;color:#53645c;border-radius:999px;padding:10px 15px;font-weight:600;cursor:pointer;transition:.2s ease}
+    .chip:hover{background:rgba(255,255,255,.55)}
+    .chip.active{background:#20372d;color:#fff;box-shadow:0 8px 22px rgba(32,55,45,.18)}
+    .view-note{font-size:13px;color:#66766e;padding:0 8px;text-align:right}
+    .scale{display:grid;gap:12px}
+    .level{--tone:#377c5a;display:grid;grid-template-columns:74px 1fr auto;align-items:center;gap:18px;padding:18px 20px;border-radius:24px;background:color-mix(in srgb,var(--tone) 11%,rgba(255,255,255,.76));border:1px solid color-mix(in srgb,var(--tone) 28%,rgba(255,255,255,.8));box-shadow:0 10px 32px rgba(44,55,49,.07);backdrop-filter:blur(17px);-webkit-backdrop-filter:blur(17px);transition:transform .22s ease,box-shadow .22s ease,opacity .25s ease;cursor:pointer;position:relative;overflow:hidden}
+    .level:before{content:"";position:absolute;inset:0 auto 0 0;width:6px;background:var(--tone)}
+    .level:hover{transform:translateY(-2px);box-shadow:0 18px 38px rgba(44,55,49,.11)}
+    .level.active{box-shadow:0 0 0 3px color-mix(in srgb,var(--tone) 72%,white),0 22px 45px rgba(37,52,44,.15);background:color-mix(in srgb,var(--tone) 17%,rgba(255,255,255,.82))}
+    .level.active:after{content:"You are here";position:absolute;right:72px;top:15px;padding:5px 9px;border-radius:999px;background:#173d2d;color:#fff;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    .level.hidden{display:none}
+    .rank{font-family:"Fraunces",Georgia,serif;font-size:34px;color:color-mix(in srgb,var(--tone) 78%,#102019);text-align:center;font-variant-numeric:tabular-nums}
+    .emotion h2{font-family:"Fraunces",Georgia,serif;font-size:clamp(23px,3vw,32px);line-height:1.1;margin:0 0 5px;font-weight:600;letter-spacing:-.025em}
+    .thought{margin:0;color:#607068;font-size:15px;line-height:1.45}
+    .open{width:42px;height:42px;display:grid;place-items:center;border:0;border-radius:50%;background:rgba(255,255,255,.66);color:#4f6259;font-size:22px;cursor:pointer;transition:.25s ease}
+    .level.expanded .open{transform:rotate(45deg);background:#20372d;color:white}
+    .bridge{grid-column:2 / 4;display:none;grid-template-columns:1fr 1fr;gap:12px;padding-top:14px;border-top:1px solid rgba(68,89,78,.12)}
+    .level.expanded .bridge{display:grid}
+    .bridge-box{padding:16px;border-radius:18px;background:rgba(255,255,255,.45)}
+    .bridge-label{font-size:11px;text-transform:uppercase;letter-spacing:.13em;font-weight:700;color:#5e7167;margin-bottom:7px}
+    .scenario{display:inline-flex;align-items:center;margin:0 0 10px;padding:5px 9px;border-radius:999px;background:color-mix(in srgb,var(--tone) 17%,white);color:color-mix(in srgb,var(--tone) 82%,#17251f);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+    .bridge p{margin:0;font-size:15px;line-height:1.5;color:#31463c}
+    .bridge .say{font-family:"Fraunces",Georgia,serif;font-size:18px;line-height:1.45}
+    .guide{margin-top:24px;border-radius:30px;padding:28px;display:grid;grid-template-columns:1.2fr 1fr;gap:30px;align-items:center}
+    .guide h2{font-family:"Fraunces",Georgia,serif;font-size:32px;margin:0 0 12px;letter-spacing:-.025em}
+    .guide p{color:#5a6b63;line-height:1.6;margin:0}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .step{background:rgba(255,255,255,.5);border-radius:18px;padding:15px}
+    .step b{display:block;font-family:"Fraunces",Georgia,serif;font-size:24px;color:#668775;margin-bottom:4px}
+    .step span{font-size:13px;line-height:1.35;color:#55665d}
+    footer{text-align:center;color:#718078;font-size:12px;line-height:1.6;padding:28px 16px 0}
+    .companion{position:fixed;z-index:50;left:50%;bottom:18px;transform:translateX(-50%);width:min(720px,calc(100% - 24px));border-radius:24px;padding:10px 10px 10px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:0 22px 62px rgba(24,43,34,.24)}
+    .companion-copy{min-width:0}
+    .companion-copy span{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#63746b;margin-bottom:3px}
+    .companion-copy strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:"Fraunces",Georgia,serif;font-size:18px;font-weight:600}
+    .shuffle{border:0;border-radius:17px;background:#173d2d;color:#fff;min-height:48px;padding:0 18px;font-weight:700;cursor:pointer;box-shadow:0 9px 22px rgba(23,61,45,.24);transition:transform .2s ease,background .2s ease;white-space:nowrap}
+    .shuffle:hover{background:#205b40;transform:translateY(-1px)}
+    .shuffle:active{transform:translateY(1px)}
+    .shuffle .arrow{display:inline-block;margin-right:7px;font-size:18px}
+    .level.refreshed{animation:pulse .42s ease}
+    @keyframes pulse{50%{transform:scale(1.012);box-shadow:0 0 0 6px color-mix(in srgb,var(--tone) 20%,transparent),0 22px 45px rgba(37,52,44,.15)}}
+    @media(max-width:720px){.shell{width:min(100% - 20px,1180px);padding-top:10px}header{border-radius:28px}.controls{top:8px;align-items:flex-start;flex-direction:column}.view-note{text-align:left}.level{grid-template-columns:52px 1fr auto;gap:10px;padding:16px 12px}.level.active:after{position:static;grid-column:2 / 4;grid-row:2;justify-self:start;margin-top:4px}.rank{font-size:28px}.bridge{grid-column:1 / 4;grid-template-columns:1fr;padding-left:4px}.guide{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr 1fr}.step{padding:12px}.thought{font-size:14px}}
+    @media(max-width:430px){h1{font-size:48px}.principle{border-radius:18px;align-items:flex-start}.segmented{display:grid;grid-template-columns:1fr 1fr;width:100%}.chip{padding:10px 8px}.level{grid-template-columns:44px 1fr auto}.rank{font-size:25px}.emotion h2{font-size:23px}.steps{grid-template-columns:1fr}.guide{padding:22px}.companion{padding:9px 9px 9px 14px;gap:9px}.companion-copy strong{font-size:15px;max-width:132px}.shuffle{padding:0 13px;font-size:13px}.shuffle .arrow{margin-right:4px}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <div class="aurora"></div>
+  <main class="shell">
+    <header class="glass">
+      <div class="eyebrow"><i></i>Abraham–Hicks inspired emotional guidance scale</div>
+      <h1>You don’t need to feel <em>great.</em><br>You need to feel a little better.</h1>
+      <p class="dek">A gentle map for moments when money feels uncertain, work feels unclear, and forcing positivity feels impossible.</p>
+      <div class="principle"><b>↑</b><span>Move one believable emotion at a time — not from fear straight to joy.</span></div>
+    </header>
+
+    <nav class="controls glass" aria-label="Filter emotional scale">
+      <div class="segmented">
+        <button class="chip active" data-filter="all">All 22</button>
+        <button class="chip" data-filter="light">Open & hopeful</button>
+        <button class="chip" data-filter="middle">The turning point</button>
+        <button class="chip" data-filter="heavy">Heavy emotions</button>
+      </div>
+      <div class="view-note">Tap any emotion for a believable next step</div>
+    </nav>
+
+    <section class="scale" id="scale" aria-label="Emotional guidance scale"></section>
+
+    <section class="guide glass">
+      <div>
+        <h2>The aim is relief, not performance.</h2>
+        <p>If the next thought feels fake, it is too far away. Choose a sentence your nervous system can actually believe. Even anger can be upward movement when you are coming from powerlessness.</p>
+      </div>
+      <div class="steps" aria-label="How to use the scale">
+        <div class="step"><b>01</b><span>Name where you honestly are.</span></div>
+        <div class="step"><b>02</b><span>Find the next softer thought.</span></div>
+        <div class="step"><b>03</b><span>Take one small grounded action.</span></div>
+      </div>
+    </section>
+    <footer>For reflective use, not as a substitute for financial, career, or mental-health support. The emotional sequence is attributed to Abraham–Hicks; examples and practices here are original adaptations.</footer>
+  </main>
+
+  <aside class="companion glass" aria-live="polite">
+    <div class="companion-copy"><span>Working with</span><strong id="active-name">14 · Worry</strong></div>
+    <button class="shuffle" id="shuffle"><span class="arrow">↻</span>Help me feel one step better</button>
+  </aside>
+
+  <script>
+    const levels = [
+      {n:1,e:"Joy · Knowledge · Empowerment · Freedom · Love · Appreciation",g:"light",t:"I trust myself. There are possibilities I can see and create.",s:"I’m available for work and money to support a life that feels deeply like mine.",a:"Capture what is working. Make the aligned decision while clarity is present."},
+      {n:2,e:"Passion",g:"light",t:"I want to build this. I can feel the energy returning.",s:"There is a direction here that genuinely excites me.",a:"Protect 30 focused minutes for the opportunity with the most energy."},
+      {n:3,e:"Enthusiasm · Eagerness · Happiness",g:"light",t:"Something promising could happen. I’m ready to explore.",s:"I don’t know the full path, but I’m looking forward to the next conversation.",a:"Send one thoughtful note, application, proposal, or introduction."},
+      {n:4,e:"Positive Expectation · Belief",g:"light",t:"I have handled uncertainty before. Things can come together.",s:"The right work may be taking shape before I can see all of it.",a:"List three pieces of evidence that support a constructive outcome."},
+      {n:5,e:"Optimism",g:"light",t:"There may be more options than I have considered.",s:"This phase could open a better way of earning or working.",a:"Write down three viable paths without ranking them yet."},
+      {n:6,e:"Hopefulness",g:"light",t:"It is possible that this will improve.",s:"I may not know how yet, but a useful next step can appear.",a:"Ask: what is one thing I can make 5% easier this week?"},
+      {n:7,e:"Contentment",g:"light",t:"For this moment, I have enough to breathe.",s:"Not everything is solved, and I can still be okay today.",a:"Pause the chase. Notice today’s resources, skills, people, and safety."},
+      {n:8,e:"Boredom",g:"middle",t:"I’m tired of thinking about this. Nothing feels interesting.",s:"I don’t need inspiration; I only need gentle movement.",a:"Do one low-stakes task: update a line, scan a role, review one expense."},
+      {n:9,e:"Pessimism",g:"middle",t:"I doubt this will work out the way I want.",s:"This may be difficult, but difficult is not the same as impossible.",a:"Separate facts from predictions. Circle only what is known today."},
+      {n:10,e:"Frustration · Irritation · Impatience",g:"middle",t:"Why is this taking so long? I should be further ahead.",s:"My frustration shows that progress matters to me.",a:"Choose the smallest delayed decision and close it in 15 minutes."},
+      {n:11,e:"Overwhelm",g:"middle",t:"There are too many decisions and I cannot hold all of them.",s:"I do not have to solve the whole future today.",a:"Reduce the horizon: make a plan only for the next 24 hours."},
+      {n:12,e:"Disappointment",g:"middle",t:"I hoped this opportunity would work, and it didn’t.",s:"This mattered to me. One outcome does not define my value or future.",a:"Name what was lost, then keep one learning for the next attempt."},
+      {n:13,e:"Doubt",g:"middle",t:"What if I’m making the wrong career or money decision?",s:"I may not have certainty, but I can gather better information.",a:"Run a reversible experiment instead of demanding a permanent answer."},
+      {n:14,e:"Worry",g:"heavy",t:"What if income stops, savings shrink, or I don’t find the right role?",s:"I am worried because I want security. I can create a little more visibility.",a:"Look at the real numbers once; define runway and one contingency."},
+      {n:15,e:"Blame",g:"heavy",t:"They wasted my time. The system or company made this harder.",s:"What happened was unfair. I can still decide what happens next.",a:"Name what was not in your control, then reclaim one decision that is."},
+      {n:16,e:"Discouragement",g:"heavy",t:"I keep trying and nothing seems to move.",s:"Slow evidence is still evidence. I do not need a breakthrough today.",a:"Review effort, not only outcomes. Repeat the one action with most signal."},
+      {n:17,e:"Anger",g:"heavy",t:"I refuse to keep being undervalued or stuck like this.",s:"This anger is showing me a boundary and returning some power.",a:"Write the boundary privately. Act only after the heat lowers."},
+      {n:18,e:"Revenge",g:"heavy",t:"I want them to see what they lost or regret how they treated me.",s:"I want my power back. My strongest move is to invest it in my own future.",a:"Do not send the message. Redirect the energy into one visible asset."},
+      {n:19,e:"Hatred · Rage",g:"heavy",t:"I cannot stand this situation, person, or system anymore.",s:"The intensity is real. I can step away before choosing what comes next.",a:"Create distance. Move your body, breathe, and postpone irreversible action."},
+      {n:20,e:"Jealousy",g:"heavy",t:"Everyone else is earning more, advancing faster, or being chosen.",s:"Their result is showing me something I want, not proving I cannot have it.",a:"Translate comparison into information: what exact quality do you desire?"},
+      {n:21,e:"Insecurity · Guilt · Unworthiness",g:"heavy",t:"Maybe I’m not good enough, valuable enough, or responsible enough.",s:"My worth is not a salary, title, client, or perfect decision.",a:"Borrow evidence: write three ways you have created value for others."},
+      {n:22,e:"Fear · Grief · Depression · Despair · Powerlessness",g:"heavy",t:"Nothing will work. I cannot see a way through.",s:"I do not need to solve this alone or right now. The next step can simply be support.",a:"Contact someone safe. If you may be in danger, seek urgent professional help."}
+    ];
+    const palette={light:["#15734c","#23845a","#359568","#4aa273","#5aad7c","#70b689","#82bd94"],middle:["#928918","#a67f18","#b96f29","#c35f42","#bc4f59","#a84d72"],heavy:["#963e65","#873a73","#74407f","#65498b","#585394","#4d6098","#426d96","#397991","#338487"]};
+    const themes={
+      work:{label:"Work & purpose",thought:["My work feels alive and connected to what matters to me.","There may be a work path I have not considered yet.","I cannot tell whether my career is moving at all.","I feel cornered by work decisions and other people’s judgment.","My work situation feels bigger than my capacity right now."],bridge:["I can follow the work that gives me honest energy.","I only need the next useful career clue, not the whole answer.","A quiet phase does not mean my career is over.","I can reclaim one choice without proving anything to anyone.","I can pause and let another person help me hold this."],action:["Protect 30 minutes for the work you most want to be known for.","Have one low-pressure conversation with someone in an adjacent path.","Record one piece of progress from the last seven days.","Write the boundary first; decide what to communicate tomorrow.","Cancel one nonessential task and contact someone safe."]},
+      money:{label:"Money",thought:["Money feels like a resource I can direct with care.","There could be more than one way for money to reach me.","I keep checking the numbers and expecting bad news.","I am furious that money has this much power over my choices.","I cannot imagine how I will become financially safe."],bridge:["I can enjoy what money supports without making it my worth.","A new client, role, saving, or adjustment can begin small.","Seeing the real number is safer than fighting an imagined one.","I can use this energy to protect myself, not punish myself.","Today’s job is support and stability, not solving my entire future."],action:["Choose one value-aligned use of money and appreciate it.","List three small income or saving experiments; choose one.","Check your runway once, then close the spreadsheet.","Wait before spending, quitting, lending, or sending the message.","Ask a trusted person to review the immediate numbers with you."]},
+      security:{label:"Safety & security",thought:["I feel grounded enough to meet what comes next.","Security may be something I build in layers, not find all at once.","I keep scanning for what could go wrong.","I hate feeling dependent on circumstances I cannot control.","My body does not feel safe enough to think clearly."],bridge:["My safety can include my skills, relationships, and judgment.","One small layer of stability is meaningful progress.","In this exact moment, I can identify what is actually safe.","My need for control is asking for a clear, smaller boundary.","I do not need clarity until my body has a little more support."],action:["Write down the five resources you can rely on today.","Create one backup step for the most likely—not worst—scenario.","Name five things that are stable in this room and this day.","Leave the situation briefly before making a permanent decision.","Eat, hydrate, rest, or sit beside someone before planning."]},
+      self:{label:"Self-worth",thought:["I know what I bring, even without external proof.","Maybe I can trust myself before everyone else validates me.","I am questioning whether I am capable or valuable enough.","I want to show everyone they were wrong about me.","I feel like the problem is me, and I cannot get away from myself."],bridge:["My value is lived; it is not awarded by a title or salary.","Self-trust can be one small promise I keep today.","Doubt is a feeling, not a final assessment of my ability.","The life I build will say more than any argument could.","I deserve care before I believe a better story about myself."],action:["Name one ability you want to use more generously.","Make and keep one ten-minute promise to yourself.","Ask someone trustworthy what value they have seen you create.","Put the proof-energy into one portfolio piece or meaningful task.","Reach out to a trusted person or professional; do not isolate."]},
+      life:{label:"Life & uncertainty",thought:["Life feels spacious enough for both ease and ambition.","I can be curious about what this chapter is becoming.","Everything feels paused, repetitive, or off-course.","I resent how much of life cannot be planned.","I cannot see a future that feels manageable from here."],bridge:["I can participate in life without controlling all of it.","This chapter can reveal itself through small lived experiments.","A slow day is not a failed life.","I can stop wrestling the whole future and choose this hour.","I only need to reach the next safe hour with support."],action:["Do one ordinary thing slowly and let it be enough.","Try one new place, person, ritual, or route this week.","Change your physical scene for ten minutes.","Choose one thing that is yours to influence before sunset.","Tell someone plainly: ‘I am struggling and need company.’"]}
+    };
+    const counters={light:0,middle:0,heavy:0};
+    const scale=document.getElementById('scale');
+    levels.forEach(x=>{
+      const tone=palette[x.g][counters[x.g]++ % palette[x.g].length];
+      const article=document.createElement('article');
+      article.className='level'; article.dataset.group=x.g; article.style.setProperty('--tone',tone);
+      article.setAttribute('aria-expanded','false');
+      article.dataset.level=x.n;
+      article.innerHTML=`<div class="rank">${String(x.n).padStart(2,'0')}</div><div class="emotion"><h2>${x.e}</h2><p class="thought">“${x.t}”</p></div><button class="open" aria-label="Show the next step for ${x.e}">+</button><div class="bridge"><div class="bridge-box"><div class="scenario">Money & work</div><div class="bridge-label">A more believable thought</div><p class="say">“${x.s}”</p></div><div class="bridge-box"><div class="bridge-label">One grounded action</div><p class="action">${x.a}</p></div></div>`;
+      const toggle=()=>{const on=article.classList.toggle('expanded');article.setAttribute('aria-expanded',String(on));};
+      article.addEventListener('click',e=>{setActive(article);if(e.target.closest('.open')||!e.target.closest('.bridge'))toggle();});
+      article.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&!e.target.closest('button')){e.preventDefault();setActive(article);toggle();}});
+      article.tabIndex=0; scale.appendChild(article);
+    });
+    let activeCard=document.querySelector('[data-level="14"]');
+    let lastTheme='';
+    function setActive(card){
+      if(!card)return;
+      document.querySelectorAll('.level.active').forEach(x=>x.classList.remove('active'));
+      activeCard=card;card.classList.add('active');
+      const item=levels[Number(card.dataset.level)-1];
+      document.getElementById('active-name').textContent=`${item.n} · ${item.e.split(' · ')[0]}`;
+    }
+    setActive(activeCard);
+    function bandIndex(n){return n<=7?0:n<=13?1:n<=16?2:n<=20?3:4}
+    function anotherPossibility(){
+      const item=levels[Number(activeCard.dataset.level)-1];
+      const keys=Object.keys(themes).filter(k=>k!==lastTheme);
+      const key=keys[Math.floor(Math.random()*keys.length)];lastTheme=key;
+      const theme=themes[key],band=bandIndex(item.n);
+      activeCard.querySelector('.thought').textContent=`“${theme.thought[band]}”`;
+      activeCard.querySelector('.scenario').textContent=theme.label;
+      activeCard.querySelector('.say').textContent=`“${theme.bridge[band]}”`;
+      activeCard.querySelector('.action').textContent=theme.action[band];
+      activeCard.classList.add('expanded','refreshed');activeCard.setAttribute('aria-expanded','true');
+      setTimeout(()=>activeCard.classList.remove('refreshed'),500);
+      activeCard.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+    document.getElementById('shuffle').addEventListener('click',anotherPossibility);
+    const observer=new IntersectionObserver(entries=>{
+      const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>Math.abs(a.boundingClientRect.top-innerHeight*.42)-Math.abs(b.boundingClientRect.top-innerHeight*.42));
+      if(visible[0]&&!document.querySelector('.level:hover'))setActive(visible[0].target);
+    },{rootMargin:'-32% 0px -48% 0px',threshold:0});
+    document.querySelectorAll('.level').forEach(card=>observer.observe(card));
+    document.querySelectorAll('.chip').forEach(btn=>btn.addEventListener('click',()=>{
+      document.querySelectorAll('.chip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+      const filter=btn.dataset.filter;
+      document.querySelectorAll('.level').forEach(card=>card.classList.toggle('hidden',filter!=='all'&&card.dataset.group!==filter));
+      if(activeCard.classList.contains('hidden'))setActive(document.querySelector('.level:not(.hidden)'));
+    }));
+  </script>
+</body>
+</html>
